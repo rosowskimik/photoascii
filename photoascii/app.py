@@ -1,13 +1,22 @@
+import shutil
 from io import BufferedReader
+from typing import Union
+
 from PIL import Image
-import pathlib
 
 LETTER_MATRIX = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
 
 
-def get_pixel_matrix(file: BufferedReader):
+def get_term_size():
+    size = shutil.get_terminal_size()
+    return (size.columns // 3, size.lines)
+
+
+def get_pixel_matrix(file: BufferedReader, scale):
     with Image.open(file) as img:
-        img.thumbnail(size=(250, 250))
+        if scale:
+            size = get_term_size() if scale is True else scale
+            img.thumbnail(size=size)
         img.show()
         width = img.width
         pixels = list(img.getdata())
@@ -39,8 +48,8 @@ def get_char_from_intensity(intensity: int) -> str:
     return char
 
 
-def convert_image(file: BufferedReader, map_type) -> str:
-    color_matrix = get_pixel_matrix(file)
+def convert_image(file: BufferedReader, map_type: str, scale: Union[bool, tuple[int, int]]) -> str:
+    color_matrix = get_pixel_matrix(file, scale)
     intensity_matrix = get_intensity_matrix(color_matrix, map_type)
 
     output = str()
