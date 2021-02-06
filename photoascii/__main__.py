@@ -27,11 +27,14 @@ def main():
                         help="resize image before converting, use 'none' to convert image 1:1 (default: scale to fit terminal)", metavar="[width]x[height]")
     parser.add_argument("-o", "--outfile", type=argparse.FileType(mode="w"),
                         dest="outfile", default=sys.stdout, help="write output to file")
+    parser.add_argument("-i", "--inverted", action="store_true",
+                        dest="inverted", default=False, help="invert light & dark colors")
 
     args = parser.parse_args()
 
     for file in args.images:
-        output_text = convert_image(file, args.map_type, args.scale)
+        output_text = convert_image(
+            file, args.map_type, args.scale, args.inverted)
         args.outfile.write(output_text)
 
     args.outfile.close()

@@ -17,7 +17,6 @@ def get_pixel_matrix(file: BufferedReader, scale):
         if scale:
             size = get_term_size() if scale is True else scale
             img.thumbnail(size=size)
-        img.show()
         width = img.width
         pixels = list(img.getdata())
 
@@ -27,15 +26,16 @@ def get_pixel_matrix(file: BufferedReader, scale):
     return pixel_matrix
 
 
-def get_intensity_matrix(pixel_matrix, map_type) -> int:
+def get_intensity_matrix(pixel_matrix, map_type, inverted) -> int:
+    to_subtract = 255 if inverted else 0
     if map_type == "average":
-        intensity_matrix = [[(r + g + b) / 3 for r, g, b in row]
+        intensity_matrix = [[abs(((r + g + b) / 3) - to_subtract) for r, g, b in row]
                             for row in pixel_matrix]
     elif map_type == "lightness":
         intensity_matrix = [
-            [(max(r, g, b) + min(r, g, b)) / 2 for r, g, b in row] for row in pixel_matrix]
+            [abs(((max(r, g, b) + min(r, g, b)) / 2) - to_subtract) for r, g, b in row] for row in pixel_matrix]
     else:
-        intensity_matrix = [[(0.21*r + 0.72*g + 0.07*b) / 3 for r, g, b in row]
+        intensity_matrix = [[abs(((0.21*r + 0.72*g + 0.07*b) / 3) - to_subtract) for r, g, b in row]
                             for row in pixel_matrix]
 
     return intensity_matrix
@@ -48,9 +48,9 @@ def get_char_from_intensity(intensity: int) -> str:
     return char
 
 
-def convert_image(file: BufferedReader, map_type: str, scale: Union[bool, tuple[int, int]]) -> str:
+def convert_image(file: BufferedReader, map_type: str, scale: Union[bool, tuple[int, int]], inverted: bool) -> str:
     color_matrix = get_pixel_matrix(file, scale)
-    intensity_matrix = get_intensity_matrix(color_matrix, map_type)
+    intensity_matrix = get_intensity_matrix(color_matrix, map_type, inverted)
 
     output = str()
     for row in intensity_matrix:
