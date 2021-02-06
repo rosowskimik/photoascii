@@ -29,13 +29,13 @@ def get_pixel_matrix(file: BufferedReader, scale):
 def get_intensity_matrix(pixel_matrix, map_type, inverted) -> int:
     to_subtract = 255 if inverted else 0
     if map_type == "average":
-        intensity_matrix = [[abs(((r + g + b) / 3) - to_subtract) for r, g, b in row]
+        intensity_matrix = [[abs(((rgb[0] + rgb[1] + rgb[3]) / 3) - to_subtract) for rgb in row]
                             for row in pixel_matrix]
     elif map_type == "lightness":
         intensity_matrix = [
-            [abs(((max(r, g, b) + min(r, g, b)) / 2) - to_subtract) for r, g, b in row] for row in pixel_matrix]
+            [abs(((max(rgb[0], rgb[1], rgb[2]) + min(rgb[0], rgb[1], rgb[2])) / 2) - to_subtract) for rgb in row] for row in pixel_matrix]
     else:
-        intensity_matrix = [[abs(((0.21*r + 0.72*g + 0.07*b) / 3) - to_subtract) for r, g, b in row]
+        intensity_matrix = [[abs(((0.21*rgb[0] + 0.72*rgb[1] + 0.07*rgb[2]) / 3) - to_subtract) for rgb in row]
                             for row in pixel_matrix]
 
     return intensity_matrix
