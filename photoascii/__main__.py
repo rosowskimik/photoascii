@@ -1,4 +1,5 @@
 import argparse
+import sys
 from photoascii import convert_image
 
 
@@ -24,14 +25,16 @@ def main():
                                                 "luminosity"), dest="map_type", default="average", help="(default: %(default)s)")
     parser.add_argument("-s", "--scale", dest="scale", default="fit", type=size_type,
                         help="resize image before converting, use 'none' to convert image 1:1 (default: scale to fit terminal)", metavar="[width]x[height]")
+    parser.add_argument("-o", "--outfile", type=argparse.FileType(mode="w"),
+                        dest="outfile", default=sys.stdout, help="write output to file")
 
     args = parser.parse_args()
 
     for file in args.images:
         output_text = convert_image(file, args.map_type, args.scale)
-        with open('output.txt', 'w') as nf:
-            nf.write(output_text)
-        # print(output_text)
+        args.outfile.write(output_text)
+
+    args.outfile.close()
 
 
 if __name__ == "__main__":
