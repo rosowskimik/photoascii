@@ -8,11 +8,13 @@ def main():
         prog="photoascii", description="Convert images to ascii art")
 
     parser.add_argument("images", type=argparse.FileType(mode="rb"), nargs="+")
+    parser.add_argument("-m", "--map", choices=("average", "lightness",
+                                                "luminosity"), dest="map_type", default="average")
 
     args = parser.parse_args()
 
     for file in args.images:
-        output_text = convert_image(file)
+        output_text = convert_image(file, args.map_type)
         with open('output.txt', 'w') as nf:
             nf.write(output_text)
 
